@@ -350,6 +350,7 @@ more information about the matching files.
 * Type::
 * Owner::
 * Mode Bits::
+* Attributes::
 * Contents::
 * Directories::
 * Filesystems::
@@ -1259,6 +1260,15 @@ situation.
 
 @end deffn
 
+
+@node Attributes
+@section Attributes
+
+Some file systems support file extended attributes to store metadata.
+These attributes may consist in user information (like an URL where a
+file has been downloaded from), security-related information (ACL,
+capabilities, SELinux context), etc.
+
 @deffn Test -context pattern
 True if file's SELinux context matches the pattern @var{pattern}.
 The pattern uses shell glob matching.
@@ -1266,6 +1276,15 @@ The pattern uses shell glob matching.
 This predicate is supported only on @code{find} versions compiled with
 SELinux support and only when SELinux is enabled.
 @end deffn
+
+@deffn Test -xattr name[=pattern]
+True if an extended attribute @samp{name} exists and its value matches
+@samp{pattern}, if this optional parameter is provided.
+
+This predicate is supported only on @code{find} versions compiled with
+xattr support.
+@end deffn
+
 
 @node Contents
 @section Contents

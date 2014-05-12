@@ -170,6 +170,12 @@ struct size_val
   uintmax_t size;
 };
 
+struct name_pattern
+{
+  char *name;
+  char *pattern;
+};
+
 
 enum xval
   {
@@ -316,6 +322,7 @@ struct predicate
     mode_t type;		/* type */
     struct format_val printf_vec; /* printf fprintf fprint ls fls print0 fprint0 print */
     security_context_t scontext; /* security context */
+    struct name_pattern namepat_tuple;  /* (name, pattern) tuple */
   } args;
 
   /* The next predicate in the user input sequence,
@@ -457,6 +464,7 @@ PREDICATEFUNCTION pred_uid;
 PREDICATEFUNCTION pred_used;
 PREDICATEFUNCTION pred_user;
 PREDICATEFUNCTION pred_writable;
+PREDICATEFUNCTION pred_xattr;
 PREDICATEFUNCTION pred_xtype;
 PREDICATEFUNCTION pred_context;
 
