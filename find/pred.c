@@ -33,6 +33,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h> /* for unlinkat() */
+#if defined(HAVE_SYS_XATTR_H)
+#include <sys/xattr.h>
+#endif
 
 /* gnulib headers. */
 #include "areadlink.h"
@@ -42,6 +45,7 @@
 #include "fnmatch.h"
 #include "stat-size.h"
 #include "stat-time.h"
+#include "xalloc.h"
 #include "yesno.h"
 
 /* find headers. */
@@ -1119,6 +1123,67 @@ pred_user (const char *pathname, struct stat *stat_buf, struct predicate *pred_p
   else
     return (false);
 }
+
+#if defined(HAVE_SYS_XATTR_H)
+bool
+pred_xattr (const char *pathname, struct stat *stat_buf, struct predicate *pred_ptr)
+{
+  size_t attrsize = 255;
+  char* attrvalue;
+  bool b;
+  ssize_t ret;
+  const char *attrname = pred_ptr->args.namepat_tuple.name;
+
+  (void) stat_buf;
+
+  if (pred_ptr->args.namepat_tuple.pattern == NULL)
+    {
+      /* Only check whether the extended attribute exists */
+      ret = lgetxattr (pathname, attrname, NULL, 0);
+      if (ret >= 0)
+	return (true);
+
+      if ((ENODATA != errno) && (ENOTSUP != errno))
+	{
+	  error (0, errno, _("lgetxattr failed: %s"),
+		 safely_quote_err_filename (0, pathname));
+	}
+      return (false);
+    }
+
+  attrvalue = xmalloc (attrsize + 1);
+  ret = lgetxattr (pathname, attrname, attrvalue, attrsize);
+  if (ret < 0 && errno == ERANGE)
+    {
+      ret = lgetxattr (pathname, attrname, NULL, 0);
+      if (ret >= 0)
+	{
+	  attrsize = (size_t) ret;
+	  attrvalue = xrealloc (attrvalue, attrsize + 1);
+	  ret = lgetxattr (pathname, attrname, attrvalue, attrsize);
+	}
+    }
+  if (ret < 0)
+    {
+      if ((ENODATA != errno) && (ENOTSUP != errno))
+	{
+	  error (0, errno, _("lgetxattr failed: %s"),
+		 safely_quote_err_filename (0, pathname));
+	}
+      free (attrvalue);
+      return (false);
+    }
+
+  /* Ensure attrvalue ends with NUL */
+  if (ret < attrsize)
+    attrsize = ret;
+  attrvalue[attrsize] = 0;
+
+  b = (fnmatch (pred_ptr->args.namepat_tuple.pattern, attrvalue, 0) == 0);
+  free (attrvalue);
+  return b;
+}
+#endif
 
 bool
 pred_xtype (const char *pathname, struct stat *stat_buf, struct predicate *pred_ptr)

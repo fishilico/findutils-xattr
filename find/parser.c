@@ -29,6 +29,9 @@
 #include <regex.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#if defined(HAVE_SYS_XATTR_H)
+#include <sys/xattr.h>
+#endif
 
 
 /* gnulib headers. */
@@ -142,6 +145,9 @@ static bool parse_xdev          (const struct parser_table*, char *argv[], int *
 static bool parse_ignore_race   (const struct parser_table*, char *argv[], int *arg_ptr);
 static bool parse_noignore_race (const struct parser_table*, char *argv[], int *arg_ptr);
 static bool parse_warn          (const struct parser_table*, char *argv[], int *arg_ptr);
+#if defined(HAVE_SYS_XATTR_H)
+static bool parse_xattr         (const struct parser_table*, char *argv[], int *arg_ptr);
+#endif
 static bool parse_xtype         (const struct parser_table*, char *argv[], int *arg_ptr);
 static bool parse_quit          (const struct parser_table*, char *argv[], int *arg_ptr);
 static bool parse_context       (const struct parser_table*, char *argv[], int *arg_ptr);
@@ -304,6 +310,9 @@ static struct parser_table const parse_table[] =
   PARSE_TEST_NP    ("wholename",             wholename), /* GNU, replaced -path, but now -path is standardized since POSIX 2008 */
   {ARG_TEST,       "writable",               parse_accesscheck, pred_writable}, /* GNU, 4.3.0+ */
   PARSE_OPTION     ("xdev",                  xdev), /* POSIX */
+#if defined(HAVE_SYS_XATTR_H)
+  PARSE_TEST       ("xattr",                 xattr),	     /* GNU */
+#endif
   PARSE_TEST       ("xtype",                 xtype),	     /* GNU */
 #ifdef UNIMPLEMENTED_UNIX
   /* It's pretty ugly for find to know about archive formats.
@@ -2627,6 +2636,47 @@ parse_warn (const struct parser_table* entry, char **argv, int *arg_ptr)
   options.warnings = true;
   return parse_noop (entry, argv, arg_ptr);
 }
+
+#if defined(HAVE_SYS_XATTR_H)
+static bool
+parse_xattr (const struct parser_table* entry, char **argv, int *arg_ptr)
+{
+  struct predicate *our_pred;
+  char *name, *pattern;
+
+  if ((argv == NULL) || (argv[*arg_ptr] == NULL))
+    return false;
+  if (!check_name_arg("-xattr", argv[*arg_ptr]))
+    return false;
+
+  fnmatch_sanitycheck();
+
+  name = argv[*arg_ptr];
+  pattern = strchr(name, '=');
+  if (pattern != NULL)
+    {
+      *pattern = 0;
+      pattern++;
+    }
+
+  if (name == NULL || *name == '\0')
+    {
+      error (EXIT_FAILURE, 0, _("Missing argument to -xattr"));
+      /*NOTREACHED*/
+      return false;
+    }
+
+  our_pred = insert_primary (entry, NULL);
+  our_pred->args.namepat_tuple.name = name;
+  our_pred->args.namepat_tuple.pattern = pattern;
+  our_pred->est_success_rate = 0.01f;
+  our_pred->need_stat = false;
+  our_pred->need_type = false;
+  (*arg_ptr)++;
+
+  return true;
+}
+#endif
 
 static bool
 parse_xtype (const struct parser_table* entry, char **argv, int *arg_ptr)

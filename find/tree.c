@@ -994,6 +994,9 @@ static struct pred_cost_lookup costlookup[] =
     { pred_used      ,  NeedsStatInfo        },
     { pred_user      ,  NeedsStatInfo        },
     { pred_writable  ,  NeedsAccessInfo      },
+#if defined(HAVE_SYS_XATTR_H)
+    { pred_xattr     ,  NeedsAccessInfo      },
+#endif
     { pred_xtype     ,  NeedsType            } /* roughly correct unless most files are symlinks */
   };
 static int pred_table_sorted = 0;

@@ -209,6 +209,11 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(sys/param.h mntent.h sys/mnttab.h sys/mntio.h sys/mkdev.h)
 dnl fdleak.c needs sys/resource.h because it calls getrlimit(2).
 AC_CHECK_FUNCS(getrlimit)
+AC_CHECK_HEADERS(sys/resource.h)
+
+dnl Check for lgetxattr provided by sys/xattr.h header
+AC_CHECK_FUNC(lgetxattr, [AC_CHECK_HEADERS(sys/xattr.h)])
+
 AC_HEADER_MAJOR
 dnl TODO: it's possible gnulib eliminates the need for AC_HEADER_DIRENT.
 AC_HEADER_DIRENT

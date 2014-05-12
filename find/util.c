@@ -193,7 +193,7 @@ Tests (N can be +N or -N or N):\n\
       -nouser -nogroup -path PATTERN -perm [-/]MODE -regex PATTERN\n\
       -readable -writable -executable\n\
       -wholename PATTERN -size N[bcwkMG] -true -type [bcdpflsD] -uid N\n\
-      -used N -user NAME -xtype [bcdpfls]\n"));
+      -used N -user NAME -xattr name[=pattern] -xtype [bcdpfls]\n"));
   HTL (_("\n\
 Actions:\n\
       -delete -print0 -printf FORMAT -fprintf FILE FORMAT -print \n\

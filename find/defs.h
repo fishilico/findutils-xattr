@@ -176,6 +176,12 @@ enum file_type
     FTYPE_COUNT
   };
 
+struct name_pattern
+{
+  char *name;
+  char *pattern;
+};
+
 enum xval
   {
     XVAL_ATIME, XVAL_BIRTHTIME, XVAL_CTIME, XVAL_MTIME, XVAL_TIME
@@ -320,6 +326,7 @@ struct predicate
     bool types[FTYPE_COUNT];	/* file type(s) */
     struct format_val printf_vec; /* printf fprintf fprint ls fls print0 fprint0 print */
     char *scontext; /* security context */
+    struct name_pattern namepat_tuple;  /* (name, pattern) tuple */
   } args;
 
   /* The next predicate in the user input sequence,
@@ -459,6 +466,7 @@ PREDICATEFUNCTION pred_uid;
 PREDICATEFUNCTION pred_used;
 PREDICATEFUNCTION pred_user;
 PREDICATEFUNCTION pred_writable;
+PREDICATEFUNCTION pred_xattr;
 PREDICATEFUNCTION pred_xtype;
 PREDICATEFUNCTION pred_context;
 

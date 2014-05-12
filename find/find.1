@@ -1142,6 +1142,12 @@ mapping (or root-squashing), since many systems implement
 in the client's kernel and so cannot make use of the UID mapping
 information held on the server.
 
+.IP "\-xattr \fIname[=pattern]\fR"
+File has extended attribute \fIname\fR and its value matches
+\fIpattern\fR, if provided.  \fIpattern\fR uses the same syntax as the
+.B \-name
+option.
+
 .IP "\-xtype \fIc\fR"
 The same as
 .B \-type
