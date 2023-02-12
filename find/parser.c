@@ -2646,8 +2646,6 @@ parse_xattr (const struct parser_table* entry, char **argv, int *arg_ptr)
 
   if ((argv == NULL) || (argv[*arg_ptr] == NULL))
     return false;
-  if (!check_name_arg("-xattr", argv[*arg_ptr]))
-    return false;
 
   fnmatch_sanitycheck();
 
